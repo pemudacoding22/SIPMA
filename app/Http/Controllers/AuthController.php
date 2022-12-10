@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -31,29 +32,20 @@ class AuthController extends Controller
         ]);
 
         // Cek apakah login valid
-        if(Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials)) {
             // Cek apakah user status = active
-            if(Auth::User()->status != 'active') {
-                Session::flash('status', 'failed');
-                Session::flash('message', 'Your account is not active yet. Please contact admin !');
-                return redirect('/login');
-            };  
+            if (Auth::User()->status != 'active') {
+                Auth::logout();
+                return redirect('/login')->with('message', 'Your account is not active yet. Please contact admin !');;
+            }
+
+            // $request->session()->regenerate();
+            if (Auth::User()->username == 'admin') {
+                return redirect('dashboard');
+            } else {
+                return redirect('profile');
+            }
         }
-
-        Session::flash('status', 'failed');
-        Session::flash('message', 'Login invalid !');
-        return redirect('/login');
-
-        // if (Auth::attempt($credentials)) {
-        //     // Cek apakah user status = active
-        //     if (Auth::User()->status != 'active') {
-        //         Session::flash('status', 'failed');
-        //         Session::flash('message', 'Your account is not active yet. Please contact admin !');
-        //         return redirect('/login');
-        //     };
-        // }
-        // Session::flash('status', 'failed');
-        // Session::flash('message', 'Login Invalid !');
-        // return redirect('/');
+        return redirect('/login')->with('message', 'Login invalid !');
     }
 }

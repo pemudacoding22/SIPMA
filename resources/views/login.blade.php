@@ -19,7 +19,7 @@
         {{-- login form --}}
 
         <div class="card" style="width: 18rem;">
-            @if (session('status'))
+            @if(session('status'))
                 <div class="alert alert-danger">
                     {{ session('message') }}
                 </div>
